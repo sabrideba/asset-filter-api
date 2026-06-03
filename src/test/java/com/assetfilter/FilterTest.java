@@ -350,4 +350,16 @@ class FilterTest {
 
         assertEquals(2, result.size());
     }
+
+    @Test
+    void testFilterIn() {
+
+        Map<String, String> car = car("Alfa Romeo", "blue", "2020");
+
+        Filter filter = Filters.in("color", "red", "blue");
+
+        List<Map<String, String>> result = new FilterEngine().apply(List.of(car), filter);
+
+        assertEquals(1, result.size());
+    }
 }

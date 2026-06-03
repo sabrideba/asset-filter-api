@@ -7,6 +7,8 @@ import com.assetfilter.filter.composite.AndFilter;
 import com.assetfilter.filter.composite.NotFilter;
 import com.assetfilter.filter.composite.OrFilter;
 
+import java.util.Arrays;
+
 public final class Filters {
 
     private Filters() {
@@ -79,17 +81,23 @@ public final class Filters {
         );
     }
 
+    public static Filter in(String property, String... values) {
+        return or(
+                Arrays.stream(values)
+                        .map(v -> new PropertyEqualsFilter(property, v))
+                        .toArray(Filter[]::new)
+        );
+    }
+
     public static Filter allEquals(String... properties) {
         if (properties == null || properties.length < 2) {
             throw new IllegalArgumentException("At least 2 properties required");
         }
 
-        Filter[] filters = new Filter[(properties.length - 1)];
-
-        for (int i = 1; i < properties.length; i++) {
-            filters[i - 1] = new PropertyEqualsPropertyFilter(properties[0], properties[i]);
-        }
-
-        return and(filters);
+        return and(
+                Arrays.stream(properties, 1, properties.length)
+                        .map(p -> new PropertyEqualsPropertyFilter(properties[0], p))
+                        .toArray(Filter[]::new)
+        );
     }
 }
