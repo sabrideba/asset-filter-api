@@ -1,8 +1,10 @@
 package com.assetfilter;
 
+import com.assetfilter.engine.FilterEngine;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -286,5 +288,66 @@ class FilterTest {
 
         assertTrue(f.matches(car));
         assertEquals("true", f.toString());
+    }
+
+    @Test
+    void testFilterList_keepOnlyRedCarsAfter2010() {
+        FilterEngine engine = new FilterEngine();
+
+        List<Map<String, String>> vehicles = List.of(
+                car("Alfa Romeo", "red", "2020"),
+                car("BMW", "blue", "2015"),
+                car("Audi", "red", "2009"),
+                car("Fiat", "red", "2018")
+        );
+
+        Filter filter = Filters.and(
+                Filters.eq("color", "red"),
+                Filters.gt("year", 2010)
+        );
+
+        List<Map<String, String>> result = engine.apply(vehicles, filter);
+
+        assertEquals(2, result.size());
+
+        assertTrue(result.stream().anyMatch(v -> v.get("brand").equals("Alfa Romeo")));
+        assertTrue(result.stream().anyMatch(v -> v.get("brand").equals("Fiat")));
+    }
+
+    @Test
+    void testFilterList_allFilteredOut() {
+
+        List<Map<String, String>> vehicles = List.of(
+                car("BMW", "blue", "2005"),
+                car("Audi", "black", "2009")
+        );
+
+        Filter filter = Filters.and(
+                Filters.eq("color", "red"),
+                Filters.gt("year", 2010)
+        );
+
+        List<Map<String, String>> result = new FilterEngine().apply(vehicles, filter);
+
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void testFilterList_orLogic() {
+
+        List<Map<String, String>> vehicles = List.of(
+                car("BMW", "blue", "2020"),
+                car("Audi", "red", "2005"),
+                car("Fiat", "green", "2005")
+        );
+
+        Filter filter = Filters.or(
+                Filters.eq("color", "red"),
+                Filters.gt("year", 2010)
+        );
+
+        List<Map<String, String>> result = new FilterEngine().apply(vehicles, filter);
+
+        assertEquals(2, result.size());
     }
 }
