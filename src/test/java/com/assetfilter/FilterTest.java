@@ -70,6 +70,16 @@ class FilterTest {
     }
 
     @Test
+    void testGtFilter2() {
+        Map<String, String> car = Map.of("year", "2020", "weight", "21.3");
+
+        Filter f = Filters.gt("weight", 19.5);
+
+        assertTrue(f.matches(car));
+        assertEquals("property weight > 19.5", f.toString());
+    }
+
+    @Test
     void testGtFilterFails() {
         Map<String, String> car = car("Alfa Romeo", "red", "2009");
 

@@ -3,6 +3,7 @@ package com.assetfilter.filter;
 import com.assetfilter.Filter;
 
 import java.util.Map;
+import java.util.Objects;
 
 public class PropertyEqualsPropertyFilter implements Filter {
 
@@ -19,7 +20,7 @@ public class PropertyEqualsPropertyFilter implements Filter {
         String a = asset.get(propertyA);
         String b = asset.get(propertyB);
 
-        if (a == null || b == null) {
+        if (Objects.isNull(a) || Objects.isNull(b)) {
             return false;
         }
 
